@@ -1,0 +1,56 @@
+# Jonathan Barış Yaprak
+
+import os
+import requests
+import signal
+import atexit
+
+#---------------------------------------------------------------
+#---------------------------------------------------------------
+
+# TASK 1 (Create child process and print pid.)
+child = os.fork()
+if child == 0:        # child == 0 represents the child process
+    print("The child PID: ", os.getpid())
+
+
+
+#---------------------------------------------------------------
+#---------------------------------------------------------------
+
+#TASK 2 (Download files with the child process.)
+urlList = ["http://wiki.netseclab.mu.edu.tr/images/thumb/f/f7/MSKU-BlockchainResearchGroup. jpeg/300px-MSKU-BlockchainResearchGroup.jpeg", "https://upload.wikimedia.org/wikipedia/tr/9/98/Mu%C4%9Fla_S%C4%B1tk%C4%B1 _Ko%C3%A7man_%C3%9Cniversitesi_logo.png", "​https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Hawai%27i.jpg/1024pxHawai%27i.jpg​", "​http://wiki.netseclab.mu.edu.tr/images/thumb/f/f7/MSKU-BlockchainResearchGroup.j peg/300px-MSKU-BlockchainResearchGroup.jpeg​", "​https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Hawai%27i.jpg/1024pxHawai%27i.jpg​"]
+
+def download_file(url, file_name=None):
+    r = requests.get(url, allow_redirects=True)
+    file = file_name if file_name else str(uuid.uuid4())
+    open(file, 'wb').write(r.content)
+
+if child == 0:
+    for url in urlList:
+        download_file(url)
+
+#---------------------------------------------------------------
+#---------------------------------------------------------------
+
+#TASK 3 (Prevent the orphan situation)
+child = os.fork()
+if child == 0:        # child == 0 represents the child process
+    print("The child PID: ", os.getpid())
+    os._exit(0)  # These lines will prevent the orphan situation
+os.wait()          # These lines will prevent the orphan situation
+
+
+# This function can also be used to prevent the orphan situation
+def kill_child():
+   if child_pid is None:
+       pass
+   else:
+       os.kill(child_pid, signal.SIGTERM)
+
+atexit.register(kill_child())
+
+#---------------------------------------------------------------
+#---------------------------------------------------------------
+
+#TASK 4 (Control duplicate files)
